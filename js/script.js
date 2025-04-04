@@ -91,4 +91,87 @@ function resetGame() {
 }
 
 // Запускаємо створення ігрового поля при завантаженні сторінки
-createBoard();
+createBoard(); 
+let animalCount = 0;
+
+document.querySelectorAll('.animal-btn').forEach(button => {
+    button.addEventListener('click', (event) => {
+        const animalType = event.target.dataset.animal;
+        addAnimal(animalType);
+    });
+});
+
+
+function addAnimal(animalType) {
+    const grass = document.getElementById('grass');
+    const animalDiv = document.createElement('div');
+    animalDiv.classList.add('animal');
+    
+    const animalImg = document.createElement('img');
+    animalImg.src = `/img/${animalType}.jpg`; // Замініть на реальний шлях до зображення
+    animalDiv.appendChild(animalImg);
+    
+    grass.appendChild(animalDiv);
+    
+    animalDiv.style.top = `${Math.random() * (grass.clientHeight - 50)}px`;
+    animalDiv.style.left = `${Math.random() * (grass.clientWidth - 50)}px`;
+
+    animalCount++;
+    updateAnimalCount();
+
+    makeDraggable(animalDiv);
+    makeMovable(animalDiv);
+}
+
+function makeDraggable(animalDiv) {
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    animalDiv.addEventListener('mousedown', (event) => {
+        isDragging = true;
+        offsetX = event.clientX - animalDiv.offsetLeft;
+        offsetY = event.clientY - animalDiv.offsetTop;
+        animalDiv.classList.add('dragging');
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (isDragging) {
+            animalDiv.style.left = `${event.clientX - offsetX}px`;
+            animalDiv.style.top = `${event.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        animalDiv.classList.remove('dragging');
+    });
+}
+
+function makeMovable(animalDiv) {
+    // Задаємо тваринам рух по екрану
+    setInterval(() => {
+        let randomDirection = Math.floor(Math.random() * 4); // 0 - вниз, 1 - вгору, 2 - вліво, 3 - вправо
+        let randomDistance = Math.floor(Math.random() * 10) + 1;
+
+        switch (randomDirection) {
+            case 0:
+                animalDiv.style.top = `${parseInt(animalDiv.style.top) + randomDistance}px`;
+                break;
+            case 1:
+                animalDiv.style.top = `${parseInt(animalDiv.style.top) - randomDistance}px`;
+                break;
+            case 2:
+                animalDiv.style.left = `${parseInt(animalDiv.style.left) - randomDistance}px`;
+                break;
+            case 3:
+                animalDiv.style.left = `${parseInt(animalDiv.style.left) + randomDistance}px`;
+                break;
+        }
+    }, 100);
+}
+
+function updateAnimalCount() {
+    document.getElementById('animal-count').innerText = animalCount;
+}
+
+
